@@ -1,0 +1,521 @@
+/* Birthday Page Styles */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #fad0c4 100%);
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 3em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    color: #fff;
+}
+
+.subtitle {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    color: #fff;
+}
+
+.birthday-card {
+    perspective: 1000px;
+    margin-bottom: 40px;
+}
+
+.card-inner {
+    position: relative;
+    width: 300px;
+    height: 400px;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.card-front {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.card-back {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    color: white;
+    transform: rotateY(180deg);
+}
+
+.open-btn {
+    padding: 12px 30px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #ff6b6b, #ff8787);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.open-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+.message-content {
+    text-align: center;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.birthday-message {
+    font-size: 1em;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.birthday-message.special {
+    font-weight: bold;
+    color: #ff6b6b;
+    font-size: 1.1em;
+}
+
+.signature {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.2em;
+    margin-top: 20px;
+}
+
+/* Balloons */
+.balloon-center {
+    position: absolute;
+    width: 40px;
+    height: 50px;
+    border-radius: 50%;
+    transition: all 3s ease-in-out;
+}
+
+.balloon1 { background: #ff6b6b; top: 50%; left: 50%; }
+.balloon2 { background: #4ecdc4; top: 50%; left: 50%; }
+.balloon3 { background: #45b7d1; top: 50%; left: 50%; }
+.balloon4 { background: #96ceb4; top: 50%; left: 50%; }
+.balloon5 { background: #feca57; top: 50%; left: 50%; }
+.balloon6 { background: #ff9ff3; top: 50%; left: 50%; }
+
+.corner {
+    position: absolute;
+    width: 40px;
+    height: 50px;
+}
+
+/* Cake and Candle Styles */
+.cake-container {
+    position: relative;
+    margin: 20px 0;
+    height: 200px;
+    z-index: 10;
+}
+
+.cake-layer {
+    position: absolute;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: fallDown 1s ease-out forwards;
+}
+
+.cake-base-layer {
+    width: 200px;
+    height: 40px;
+    background: linear-gradient(to bottom, #f4a261, #e76f51);
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    animation-delay: 0.5s;
+}
+
+.cake-middle-layer {
+    width: 160px;
+    height: 35px;
+    background: linear-gradient(to bottom, #f4a261, #e76f51);
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation-delay: 0.3s;
+}
+
+.cake-top-layer {
+    width: 120px;
+    height: 30px;
+    background: linear-gradient(to bottom, #f4a261, #e76f51);
+    bottom: 75px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation-delay: 0.1s;
+}
+
+.candle-layer {
+    position: absolute;
+    bottom: 105px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: fallDown 1s ease-out 0.7s forwards;
+}
+
+.candle {
+    width: 20px;
+    height: 60px;
+    background: linear-gradient(to bottom, #fff, #f0f0f0);
+    border-radius: 10px 10px 0 0;
+    position: relative;
+}
+
+.flame {
+    width: 15px;
+    height: 25px;
+    background: linear-gradient(to top, #ff6b6b, #ff8787, #ffa502);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: flicker 1.5s ease-in-out infinite alternate;
+    box-shadow: 0 0 20px #ff6b6b, 0 0 40px #ff6b6b, 0 0 60px #ff6b6b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+@keyframes fallDown {
+    0% {
+        transform: translateX(-50%) translateY(-200px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.flame:hover {
+    transform: translateX(-50%) scale(1.1);
+    box-shadow: 0 0 30px #ff6b6b, 0 0 60px #ff6b6b, 0 0 90px #ff6b6b;
+}
+
+@keyframes flicker {
+    0% {
+        transform: translateX(-50%) scale(1) rotate(-2deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translateX(-50%) scale(1.05) rotate(2deg);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateX(-50%) scale(1) rotate(-2deg);
+        opacity: 1;
+    }
+}
+
+/* Floating Hearts */
+.floating-hearts {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.heart {
+    position: absolute;
+    font-size: 2em;
+    animation: float 3s ease-in-out infinite;
+}
+
+.heart1 { top: 10%; left: 10%; animation-delay: 0s; }
+.heart2 { top: 20%; right: 15%; animation-delay: 0.5s; }
+.heart3 { top: 30%; left: 20%; animation-delay: 1s; }
+.heart4 { top: 40%; right: 25%; animation-delay: 1.5s; }
+.heart5 { top: 50%; left: 30%; animation-delay: 2s; }
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Confetti */
+.confetti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    animation: fall 3s ease-in-out infinite;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2.5em;
+    }
+    
+    .birthday-card {
+        width: 280px;
+        height: 380px;
+    }
+    
+    .cake-base-layer {
+        width: 180px;
+        height: 35px;
+    }
+    
+    .cake-middle-layer {
+        width: 140px;
+        height: 30px;
+    }
+    
+    .cake-top-layer {
+        width: 100px;
+        height: 25px;
+    }
+    
+    .candle {
+        width: 15px;
+        height: 45px;
+    }
+    
+    .flame {
+        width: 12px;
+        height: 20px;
+    }
+}
+
+/* Lead page styles */
+.lead-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+
+.lead-container h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.lead-video {
+    width: 80%;
+    max-width: 600px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    margin-bottom: 40px;
+}
+
+/* 3D Rotating Cube */
+.cube-container {
+    perspective: 1000px;
+    margin-bottom: 40px;
+}
+
+.cube {
+    width: 200px;
+    height: 200px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: rotateCube 10s infinite linear;
+}
+
+.cube:hover {
+    animation-play-state: paused;
+}
+
+.face {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.face1 {
+    transform: translateZ(100px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.face2 {
+    transform: rotateY(90deg) translateZ(100px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.face3 {
+    transform: rotateY(180deg) translateZ(100px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.face4 {
+    transform: rotateY(-90deg) translateZ(100px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.face5 {
+    transform: rotateX(90deg) translateZ(100px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.face6 {
+    transform: rotateX(-90deg) translateZ(100px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes rotateCube {
+    0% {
+        transform: rotateX(0deg) rotateY(0deg);
+    }
+    100% {
+        transform: rotateX(360deg) rotateY(360deg);
+    }
+}
+
+/* Password Form */
+.password-form {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.password-form label {
+    display: block;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.password-form input[type="password"] {
+    padding: 12px 20px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 25px;
+    outline: none;
+    width: 250px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.password-form button {
+    padding: 12px 30px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #ff6b6b, #ff8787);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.password-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+.error-message {
+    color: #ff6b6b;
+    font-size: 1em;
+    margin-top: 10px;
+    min-height: 20px;
+}
+
+/* Responsive for lead page */
+@media (max-width: 768px) {
+    .lead-container h1 {
+        font-size: 2em;
+    }
+    
+    .cube {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .face {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .face1 { transform: translateZ(75px); }
+    .face2 { transform: rotateY(90deg) translateZ(75px); }
+    .face3 { transform: rotateY(180deg) translateZ(75px); }
+    .face4 { transform: rotateY(-90deg) translateZ(75px); }
+    .face5 { transform: rotateX(90deg) translateZ(75px); }
+    .face6 { transform: rotateX(-90deg) translateZ(75px); }
+    
+    .password-form input[type="password"] {
+        width: 200px;
+    }
+}

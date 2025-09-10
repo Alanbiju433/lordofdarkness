@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friendship Intro</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .intro-container {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .poetic-text {
+            font-size: 2em;
+            line-height: 1.5;
+            opacity: 0;
+            animation: fadeIn 3s ease-in-out 1s forwards;
+            margin-bottom: 50px;
+        }
+
+        .poetic-text p {
+            margin: 10px 0;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .clickable-gift {
+            width: 100px;
+            height: 100px;
+            background: url('creative gift box.png') no-repeat center;
+            background-size: cover;
+            border-radius: 15px;
+            cursor: pointer;
+            animation: float 2s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .clickable-gift:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .birthday-message {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3em;
+            color: white;
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+        }
+
+        @media (max-width: 768px) {
+            .poetic-text {
+                font-size: 1.5em;
+            }
+            .clickable-gift {
+                width: 80px;
+                height: 80px;
+            }
+            .birthday-message {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles">
+        <canvas id="particleCanvas"></canvas>
+    </div>
+    <div class="intro-container">
+        <div class="poetic-text">
+            <p>In the tapestry of life,</p>
+            <p>friendship weaves the brightest threads.</p>
+            <p>Today, we celebrate not just a birthday,</p>
+            <p>but the joy of having you in our world.</p>
+            <p>Click the gift to begin the celebration...</p>
+        </div>
+        <div class="clickable-gift" id="enterBtn"></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        // Function to draw a circle
+        function drawCircle(x, y, size, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Particle class
+        class Particle {
+            constructor(x, y, targetX, targetY) {
+                this.x = x;
+                this.y = y;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                this.size = Math.random() * 2 + 1;
+                this.color = '#ff69b4';
+                this.phase = 0; // 0: scatter, 1: form text, 2: disperse
+            }
+
+            update() {
+                if (this.phase === 0) {
+                    // Scatter
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                } else if (this.phase === 1) {
+                    // Move to target
+                    const dx = this.targetX - this.x;
+                    const dy = this.targetY - this.y;
+                    this.x += dx * 0.05;
+                    this.y += dy * 0.05;
+                } else {
+                    // Disperse
+                    this.x += this.vx;
+                    this.y += this.vy;
+                }
+            }
+
+            draw() {
+                drawCircle(this.x, this.y, this.size, this.color);
+            }
+        }
+
+        // Define target positions for "fatii"
+        const text = "fatii";
+        const fontSize = 120;
+        ctx.font = `${fontSize}px Arial`;
+        const textWidth = ctx.measureText(text).width;
+        const startX = (canvas.width - textWidth) / 2;
+        const startY = canvas.height * 0.7 + fontSize / 2;
+
+        // Get pixel data for text
+        const offscreenCanvas = document.createElement('canvas');
+        const offCtx = offscreenCanvas.getContext('2d');
+        offscreenCanvas.width = canvas.width;
+        offscreenCanvas.height = canvas.height;
+        offCtx.font = `${fontSize}px Arial`;
+        offCtx.fillText(text, startX, startY);
+        const imageData = offCtx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+
+        const targets = [];
+        for (let y = 0; y < canvas.height; y += 2) {
+            for (let x = 0; x < canvas.width; x += 2) {
+                const index = (y * canvas.width + x) * 4;
+                if (data[index + 3] > 128) { // alpha > 128
+                    targets.push({ x, y });
+                }
+            }
+        }
+
+        // Define heart targets
+        const heartTargets = [];
+        const scale = 8; // smaller scale for corner hearts
+        const numHearts = 5;
+        const corners = [
+            { x: 0.1 * canvas.width, y: 0.1 * canvas.height }, // top-left
+            { x: 0.9 * canvas.width, y: 0.1 * canvas.height }, // top-right
+            { x: 0.1 * canvas.width, y: 0.9 * canvas.height }, // bottom-left
+            { x: 0.9 * canvas.width, y: 0.9 * canvas.height }, // bottom-right
+            { x: 0.5 * canvas.width, y: 0.5 * canvas.height }, // center
+        ];
+        for (let h = 0; h < numHearts; h++) {
+            const heartX = corners[h].x;
+            const heartY = corners[h].y;
+            for (let r = 0; r < 1; r += 0.05) {
+                for (let t = 0; t < Math.PI * 2; t += 0.02) {
+                    const x = 16 * Math.pow(Math.sin(t), 3) * r;
+                    const y = (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * r;
+                    heartTargets.push({ x: heartX + x * scale, y: heartY - y * scale });
+                }
+            }
+        }
+
+        // Create particles
+        const particles = [];
+        for (let i = 0; i < targets.length; i++) {
+            const target = targets[i];
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            particles.push(new Particle(x, y, target.x, target.y));
+        }
+
+        let phase = 0;
+        let phaseTimer = 0;
+
+        // Rocket class
+        class Rocket {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vy = -8; // upwards
+                this.color = color;
+                this.exploded = false;
+                this.trail = [];
+            }
+
+            update() {
+                if (!this.exploded) {
+                    this.y += this.vy;
+                    this.trail.push({ x: this.x, y: this.y });
+                    if (this.trail.length > 10) this.trail.shift();
+                    if (this.y < canvas.height * 0.3) {
+                        this.explode();
+                    }
+                }
+            }
+
+            explode() {
+                this.exploded = true;
+                // Assign a segment of heartTargets to this rocket's particles
+                const segmentSize = Math.floor(heartTargets.length / 5); // assuming 5 rockets
+                const startIndex = (heartTargetIndex * segmentSize) % heartTargets.length;
+                for (let i = 0; i < segmentSize; i++) {
+                    const angle = Math.random() * 2 * Math.PI;
+                    const speed = Math.random() * 5 + 2;
+                    const vx = Math.cos(angle) * speed;
+                    const vy = Math.sin(angle) * speed;
+                    const targetIndex = (startIndex + i) % heartTargets.length;
+                    const target = heartTargets[targetIndex];
+                    fireworks.push(new FireworkParticle(this.x, this.y, vx, vy, Math.random() * 2 + 1, this.color, target.x, target.y));
+                }
+                heartTargetIndex++;
+            }
+
+            draw() {
+                if (!this.exploded) {
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x - 2, this.y - 10, 4, 10);
+                    this.trail.forEach((point, index) => {
+                        ctx.globalAlpha = index / this.trail.length;
+                        drawCircle(point.x, point.y, 1, this.color);
+                    });
+                    ctx.globalAlpha = 1;
+                }
+            }
+        }
+
+        // Fireworks particles
+        class FireworkParticle {
+            constructor(x, y, vx, vy, size, color, targetX, targetY) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.size = size;
+                this.color = color;
+                this.alpha = 1;
+                this.gravity = 0.1;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.phase = 0; // 0: explode, 1: form heart
+            }
+
+            update() {
+                if (this.phase === 0) {
+                    this.vx *= 0.99;
+                    this.vy += this.gravity;
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.alpha -= 0.01;
+                    if (this.vy > 0 && this.alpha < 0.5) {
+                        this.phase = 1;
+                    }
+                } else if (this.phase === 1) {
+                    const dx = this.targetX - this.x;
+                    const dy = this.targetY - this.y;
+                    this.x += dx * 0.05;
+                    this.y += dy * 0.05;
+                    if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
+                        this.vx = 0;
+                        this.vy = 0;
+                        this.alpha = 1;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                drawCircle(this.x, this.y, this.size, this.color);
+                ctx.restore();
+            }
+        }
+
+        let rockets = [];
+        let fireworks = [];
+        let showFireworks = false;
+        let birthdayMessageShown = false;
+        let heartTargetIndex = 0;
+
+        function createFireworks() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'];
+            for (let i = 0; i < 5; i++) {
+                const x = canvas.width / 2 + (i - 2) * 100;
+                const color = colors[i % colors.length];
+                rockets.push(new Rocket(x, canvas.height * 0.9, color));
+            }
+        }
+
+        function typeWriter(text, element, delay = 100) {
+            let i = 0;
+            element.textContent = '';
+            element.style.opacity = 1;
+            function typing() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(typing, delay);
+                }
+            }
+            typing();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (phase === 0 && phaseTimer > 200) {
+                phase = 1;
+                phaseTimer = 0;
+            }
+
+            if (phase === 1 && phaseTimer > 300 && !showFireworks) {
+                showFireworks = true;
+                createFireworks();
+            }
+
+            particles.forEach(p => {
+                p.phase = phase;
+                p.update();
+                p.draw();
+            });
+
+            if (showFireworks) {
+                rockets.forEach(r => {
+                    r.update();
+                    r.draw();
+                });
+                fireworks.forEach((f, index) => {
+                    f.update();
+                    f.draw();
+                    if (f.alpha <= 0) {
+                        fireworks.splice(index, 1);
+                    }
+                });
+                if (rockets.every(r => r.exploded) && fireworks.length === 0 && !birthdayMessageShown) {
+                    birthdayMessageShown = true;
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'birthday-message';
+                    document.body.appendChild(messageDiv);
+                    typeWriter('Happy Birthday!', messageDiv, 150);
+                }
+            }
+
+            phaseTimer++;
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Click event to redirect
+        document.getElementById('enterBtn').addEventListener('click', () => {
+            window.location.href = 'wish.html';
+        });
+    </script>
+</body>
+</html>
