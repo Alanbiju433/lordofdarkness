@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Real-time Chat</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
     <script src="/socket.io/socket.io.js"></script>
     <style>
         * {
@@ -14,10 +13,10 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
-            display: flex; 
+            display: flex;
             justify-content: center;
             align-items: center;
         }
@@ -39,12 +38,10 @@
             color: white;
             padding: 20px;
             text-align: center;
-            position: relative;
         }
 
         .chat-header h2 {
             margin: 0;
-            font-size: 1.5em;
         }
 
         .online-users {
@@ -64,12 +61,6 @@
             margin-bottom: 15px;
             display: flex;
             align-items: flex-start;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.user {
@@ -87,18 +78,15 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 0.9em;
         }
 
         .message-content {
             max-width: 70%;
-            word-wrap: break-word;
         }
 
         .message-bubble {
             padding: 12px 16px;
             border-radius: 18px;
-            position: relative;
         }
 
         .message.user .message-bubble {
@@ -120,14 +108,6 @@
             margin-top: 5px;
         }
 
-        .typing-indicator {
-            display: none;
-            padding: 10px;
-            font-style: italic;
-            color: #666;
-            font-size: 0.9em;
-        }
-
         .chat-input-container {
             padding: 20px;
             background: white;
@@ -137,7 +117,6 @@
         .chat-input {
             display: flex;
             gap: 10px;
-            align-items: center;
         }
 
         .chat-input input {
@@ -146,12 +125,6 @@
             border: 1px solid #e0e0e0;
             border-radius: 25px;
             outline: none;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-
-        .chat-input input:focus {
-            border-color: #667eea;
         }
 
         .chat-input button {
@@ -161,16 +134,6 @@
             border: none;
             border-radius: 25px;
             cursor: pointer;
-            font-weight: 600;
-            transition: transform 0.2s;
-        }
-
-        .chat-input button:hover {
-            transform: scale(1.05);
-        }
-
-        .chat-input button:active {
-            transform: scale(0.95);
         }
 
         .login-container {
@@ -193,7 +156,6 @@
             margin: 10px 0;
             border: 1px solid #ddd;
             border-radius: 8px;
-            font-size: 1em;
         }
 
         .login-form button {
@@ -204,34 +166,17 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
         }
 
         .hidden {
             display: none !important;
         }
 
-        .connection-status {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #4CAF50;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .connection-status.disconnected {
-            background: #f44336;
-            animation: none;
+        .typing-indicator {
+            display: none;
+            padding: 10px;
+            font-style: italic;
+            color: #666;
         }
     </style>
 </head>
@@ -241,7 +186,7 @@
         <div class="login-container">
             <h2>Join Chat</h2>
             <form id="loginForm" class="login-form">
-                <input type="text" id="usernameInput" placeholder="Enter your name" required maxlength="20" autofocus>
+                <input type="text" id="usernameInput" placeholder="Enter your name" required>
                 <button type="submit">Join Chat</button>
             </form>
         </div>
@@ -250,32 +195,29 @@
     <!-- Chat Screen -->
     <div id="chatScreen" class="chat-container hidden">
         <div class="chat-header">
-            <div class="connection-status" id="connectionStatus"></div>
             <h2>Real-time Chat</h2>
             <div class="online-users">
                 <span id="onlineCount">0</span> users online
             </div>
         </div>
-        
+
         <div class="chat-messages" id="chatMessages">
             <div class="typing-indicator" id="typingIndicator">
                 Someone is typing...
             </div>
         </div>
-        
+
         <div class="chat-input-container">
             <form id="chatForm" class="chat-input">
-                <input type="text" id="messageInput" placeholder="Type your message..." maxlength="500" required>
+                <input type="text" id="messageInput" placeholder="Type your message..." required>
                 <button type="submit">Send</button>
             </form>
         </div>
     </div>
 
     <script>
-        // Socket.io connection - connect to the correct server
         const socket = io();
-        
-        // DOM elements
+
         const loginScreen = document.getElementById('loginScreen');
         const chatScreen = document.getElementById('chatScreen');
         const loginForm = document.getElementById('loginForm');
@@ -284,27 +226,10 @@
         const messageInput = document.getElementById('messageInput');
         const chatMessages = document.getElementById('chatMessages');
         const onlineCount = document.getElementById('onlineCount');
-        const connectionStatus = document.getElementById('connectionStatus');
         const typingIndicator = document.getElementById('typingIndicator');
-        
+
         let currentUsername = '';
         let typingTimer;
-        
-        // Connection status
-        socket.on('connect', () => {
-            connectionStatus.classList.remove('disconnected');
-        });
-        
-        socket.on('disconnect', () => {
-            connectionStatus.classList.add('disconnected');
-        });
-        
-        // Show login screen initially
-        loginScreen.style.display = 'flex';
-        chatScreen.style.display = 'none';
-
-        // Focus username input on page load
-        usernameInput.focus();
 
         // Login form handler
         loginForm.addEventListener('submit', (e) => {
@@ -312,14 +237,12 @@
             const username = usernameInput.value.trim();
             if (username) {
                 currentUsername = username;
-                loginScreen.style.display = 'none';
-                chatScreen.style.display = 'flex';
+                loginScreen.classList.add('hidden');
+                chatScreen.classList.remove('hidden');
                 socket.emit('join', { username });
-                // Prevent default navigation to chat.html
-                // Ensure no form action or link redirects to chat.html
             }
         });
-        
+
         // Chat form handler
         chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -329,7 +252,7 @@
                 messageInput.value = '';
             }
         });
-        
+
         // Typing indicator
         messageInput.addEventListener('input', () => {
             clearTimeout(typingTimer);
@@ -338,20 +261,24 @@
                 socket.emit('typing', { isTyping: false });
             }, 1000);
         });
-        
+
         // Socket event listeners
         socket.on('user-joined', (user) => {
             addMessage(`${user.username} joined the chat`, 'System', new Date());
         });
-        
+
+        socket.on('user-left', (user) => {
+            addMessage(`${user.username} left the chat`, 'System', new Date());
+        });
+
         socket.on('new-message', (msg) => {
             addMessage(msg.text, msg.user.username, msg.timestamp);
         });
-        
+
         socket.on('users-list', (users) => {
             onlineCount.textContent = users.length;
         });
-        
+
         socket.on('user-typing', (data) => {
             if (data.isTyping) {
                 typingIndicator.style.display = 'block';
@@ -360,20 +287,20 @@
                 typingIndicator.style.display = 'none';
             }
         });
-        
+
         socket.on('load-messages', (messages) => {
             messages.forEach(msg => {
                 addMessage(msg.text, msg.user.username, msg.timestamp);
             });
         });
-        
+
         function addMessage(message, sender, timestamp) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
-            
+
             const isUser = sender === currentUsername;
             messageDiv.classList.add(isUser ? 'user' : 'other');
-            
+
             const timeString = new Date(timestamp).toLocaleTimeString();
             messageDiv.innerHTML = `
                 <div class="message-avatar">${sender.charAt(0).toUpperCase()}</div>
@@ -385,7 +312,7 @@
                     </div>
                 </div>
             `;
-            
+
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
