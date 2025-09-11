@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Will You Be Happy With Me Forever?</title>
-    <link rel="stylesheet" href="styles.css">
     <script src="bgm.js"></script>
+    <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -337,8 +337,8 @@
             height: 125px;
             background: url('not.png') no-repeat;
             border-radius: 5px;
-            cursor: grab;
-            transition: transform 0.2s ease;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             position: absolute;
             background-size: 600px 400px;
@@ -347,12 +347,13 @@
 
         .puzzle-piece:hover {
             transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .puzzle-piece.dragging {
-            opacity: 0.8;
-            transform: rotate(2deg);
-            z-index: 1000;
+        .puzzle-piece.selected {
+            border: 3px solid #d63384;
+            box-shadow: 0 0 10px rgba(214, 51, 132, 0.5);
+            transform: scale(1.05);
         }
 
         .drop-zone {
@@ -609,16 +610,21 @@
             // Hide buttons
             document.querySelector('.proposal-buttons').style.display = 'none';
             document.querySelector('.proposal-message').style.display = 'none';
-            
+
             // Show celebration
             document.getElementById('celebration').style.display = 'block';
-            
+
             // Create fireworks
             createFireworks();
-            
+
+            // Play background music
+            if (window.playBGM) {
+                window.playBGM();
+            }
+
             // Change background to more romantic
             document.body.style.background = 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fad0c4 100%)';
-            
+
             // Add more floating hearts
             createFloatingHearts();
         }
@@ -635,23 +641,24 @@
         createFloatingHearts();
 
         // Puzzle logic for visual card puzzle
-        let draggedElement = null;
+        let selectedPieces = [];
         let puzzlePieces = [];
-        let dropZones = [];
+
+        // Correct positions for pieces (based on board padding 10px, piece size 190x125, gap 2px)
+        const correctPositions = [
+            { left: 10, top: 10 },
+            { left: 212, top: 10 },
+            { left: 414, top: 10 },
+            { left: 10, top: 147 },
+            { left: 212, top: 147 },
+            { left: 414, top: 147 },
+            { left: 10, top: 284 },
+            { left: 212, top: 284 },
+            { left: 414, top: 284 }
+        ];
 
         function initPuzzle() {
             const board = document.getElementById('puzzle-board');
-
-            // Create drop zones (3x3 grid)
-            for (let i = 0; i < 9; i++) {
-                const dropZone = document.createElement('div');
-                dropZone.className = 'drop-zone';
-                dropZone.dataset.position = i;
-                dropZone.addEventListener('dragover', dragOver);
-                dropZone.addEventListener('drop', drop);
-                board.appendChild(dropZone);
-                dropZones.push(dropZone);
-            }
 
             // Create puzzle pieces with background positioning
             const positions = [
@@ -660,69 +667,65 @@
                 { x: 0, y: -266 }, { x: -200, y: -266 }, { x: -400, y: -266 }
             ];
 
-            // Shuffle positions
+            // Shuffle positions for random initial placement
             const shuffledPositions = [...positions].sort(() => Math.random() - 0.5);
 
             shuffledPositions.forEach((pos, index) => {
                 const pieceElement = document.createElement('div');
                 pieceElement.className = 'puzzle-piece';
-                pieceElement.draggable = true;
-                pieceElement.dataset.position = index;
                 pieceElement.dataset.correctPosition = positions.indexOf(pos);
                 pieceElement.style.backgroundPosition = `${pos.x}px ${pos.y}px`;
-                pieceElement.style.left = Math.random() * 400 + 'px';
-                pieceElement.style.top = Math.random() * 200 + 'px';
-                pieceElement.addEventListener('dragstart', dragStart);
-                pieceElement.addEventListener('dragend', dragEnd);
+                pieceElement.style.left = correctPositions[index].left + 'px';
+                pieceElement.style.top = correctPositions[index].top + 'px';
+                pieceElement.addEventListener('click', selectPiece);
                 board.appendChild(pieceElement);
                 puzzlePieces.push(pieceElement);
             });
         }
 
-        function dragStart(e) {
-            draggedElement = e.target;
-            e.target.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-        }
-
-        function dragEnd(e) {
-            e.target.classList.remove('dragging');
-        }
-
-        function dragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        }
-
-        function drop(e) {
-            e.preventDefault();
-            const dropZone = e.target.closest('.drop-zone');
-            if (dropZone && draggedElement) {
-                const pieceCorrectPosition = parseInt(draggedElement.dataset.correctPosition);
-                const zonePosition = parseInt(dropZone.dataset.position);
-
-                if (pieceCorrectPosition === zonePosition) {
-                    // Correct position
-                    draggedElement.style.left = dropZone.offsetLeft + 'px';
-                    draggedElement.style.top = dropZone.offsetTop + 'px';
-                    draggedElement.classList.add('correct');
-                    dropZone.classList.add('correct');
-
-                    // Check if puzzle is complete
-                    checkPuzzleComplete();
-                } else {
-                    // Wrong position, return to random position
-                    draggedElement.style.left = Math.random() * 400 + 'px';
-                    draggedElement.style.top = Math.random() * 200 + 'px';
-                }
+        function selectPiece(e) {
+            const piece = e.target;
+            if (selectedPieces.length < 2 && !piece.classList.contains('selected')) {
+                piece.classList.add('selected');
+                selectedPieces.push(piece);
             }
-            draggedElement = null;
+
+            if (selectedPieces.length === 2) {
+                swapPieces();
+            }
+        }
+
+        function swapPieces() {
+            const piece1 = selectedPieces[0];
+            const piece2 = selectedPieces[1];
+
+            // Swap background positions
+            const tempBg = piece1.style.backgroundPosition;
+            piece1.style.backgroundPosition = piece2.style.backgroundPosition;
+            piece2.style.backgroundPosition = tempBg;
+
+            // Swap correct positions
+            const tempCorrect = piece1.dataset.correctPosition;
+            piece1.dataset.correctPosition = piece2.dataset.correctPosition;
+            piece2.dataset.correctPosition = tempCorrect;
+
+            // Clear selection
+            selectedPieces.forEach(p => p.classList.remove('selected'));
+            selectedPieces = [];
+
+            // Check if puzzle is complete
+            checkPuzzleComplete();
         }
 
         function checkPuzzleComplete() {
-            const correctPieces = document.querySelectorAll('.puzzle-piece.correct').length;
+            let complete = true;
+            puzzlePieces.forEach((piece, index) => {
+                if (parseInt(piece.dataset.correctPosition) !== index) {
+                    complete = false;
+                }
+            });
 
-            if (correctPieces === 9) {
+            if (complete) {
                 // Puzzle complete, show assembled image for 5 seconds
                 document.querySelector('.puzzle-title').textContent = 'Puzzle Complete! 💕';
                 setTimeout(() => {
@@ -737,4 +740,3 @@
     </script>
 </body>
 </html>
-
